@@ -1,0 +1,27 @@
+kind = "mobile"
+previewPath = "/"
+title = "English-Hindi Dictionary"
+version = "1.0.0"
+id = "artifacts/dictionary"
+router = "expo-domain"
+
+[[integratedSkills]]
+name = "expo"
+version = "1.0.0"
+
+[[services]]
+ensurePreviewReachable = "/status"
+name = "expo"
+paths = [ "/" ]
+localPort = 24466
+
+[services.development]
+run = "pnpm --filter @workspace/dictionary run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/dictionary", "run", "build" ]
+run = [ "pnpm", "--filter", "@workspace/dictionary", "run", "serve" ]
+
+[services.env]
+PORT = "24466"
+BASE_PATH = "/"
