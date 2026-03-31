@@ -16,9 +16,17 @@ function NativeTabLayout() {
         <Icon sf={{ default: "book", selected: "book.fill" }} />
         <Label>Dictionary</Label>
       </NativeTabs.Trigger>
+      <NativeTabs.Trigger name="translate">
+        <Icon sf={{ default: "globe", selected: "globe.fill" }} />
+        <Label>Translate</Label>
+      </NativeTabs.Trigger>
       <NativeTabs.Trigger name="favorites">
         <Icon sf={{ default: "bookmark", selected: "bookmark.fill" }} />
         <Label>Saved</Label>
+      </NativeTabs.Trigger>
+      <NativeTabs.Trigger name="profile">
+        <Icon sf={{ default: "person.circle", selected: "person.circle.fill" }} />
+        <Label>Profile</Label>
       </NativeTabs.Trigger>
     </NativeTabs>
   );
@@ -41,9 +49,13 @@ function ClassicTabLayout() {
           position: "absolute",
           backgroundColor: isIOS ? "transparent" : colors.navy,
           borderTopWidth: 1,
-          borderTopColor: colors.gold + '30',
+          borderTopColor: colors.gold + "30",
           elevation: 0,
-          ...(isWeb ? { height: 84 } : {}),
+          ...(isWeb ? { height: 64 } : {}),
+        },
+        tabBarLabelStyle: {
+          fontSize: 10,
+          marginBottom: isWeb ? 4 : 0,
         },
         tabBarBackground: () =>
           isIOS ? (
@@ -53,12 +65,7 @@ function ClassicTabLayout() {
               style={StyleSheet.absoluteFill}
             />
           ) : isWeb ? (
-            <View
-              style={[
-                StyleSheet.absoluteFill,
-                { backgroundColor: colors.navy },
-              ]}
-            />
+            <View style={[StyleSheet.absoluteFill, { backgroundColor: colors.navy }]} />
           ) : null,
       }}
     >
@@ -68,9 +75,21 @@ function ClassicTabLayout() {
           title: "Dictionary",
           tabBarIcon: ({ color }) =>
             isIOS ? (
-              <SymbolView name="book" tintColor={color} size={24} />
+              <SymbolView name="book" tintColor={color} size={22} />
             ) : (
               <Feather name="book-open" size={22} color={color} />
+            ),
+        }}
+      />
+      <Tabs.Screen
+        name="translate"
+        options={{
+          title: "Translate",
+          tabBarIcon: ({ color }) =>
+            isIOS ? (
+              <SymbolView name="globe" tintColor={color} size={22} />
+            ) : (
+              <Feather name="globe" size={22} color={color} />
             ),
         }}
       />
@@ -80,9 +99,21 @@ function ClassicTabLayout() {
           title: "Saved",
           tabBarIcon: ({ color }) =>
             isIOS ? (
-              <SymbolView name="bookmark" tintColor={color} size={24} />
+              <SymbolView name="bookmark" tintColor={color} size={22} />
             ) : (
               <Feather name="bookmark" size={22} color={color} />
+            ),
+        }}
+      />
+      <Tabs.Screen
+        name="profile"
+        options={{
+          title: "Profile",
+          tabBarIcon: ({ color }) =>
+            isIOS ? (
+              <SymbolView name="person.circle" tintColor={color} size={22} />
+            ) : (
+              <Feather name="user" size={22} color={color} />
             ),
         }}
       />
