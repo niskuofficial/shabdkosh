@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useRef, useEffect } from 'react';
 import {
   View,
   Text,
@@ -6,6 +6,7 @@ import {
   FlatList,
   TouchableOpacity,
   Platform,
+  ActivityIndicator,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Feather } from '@expo/vector-icons';
@@ -16,36 +17,78 @@ import { useColors } from '@/hooks/useColors';
 import { useApp } from '@/context/AppContext';
 import SearchBar from '@/components/SearchBar';
 import WordCard from '@/components/WordCard';
+import ApiWordCard from '@/components/ApiWordCard';
 import { searchWords, getWordOfDay, DictionaryEntry } from '@/data/dictionary';
+import { lookupWord, ApiWordEntry } from '@/utils/dictionaryApi';
 import { fonts } from '@/utils/fonts';
+
+type SearchState = 'idle' | 'local' | 'loading' | 'api' | 'empty';
 
 export default function HomeScreen() {
   const colors = useColors();
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const { addToRecent, recentWords } = useApp();
+
   const [query, setQuery] = useState('');
-  const [results, setResults] = useState<DictionaryEntry[]>([]);
-  const [hasSearched, setHasSearched] = useState(false);
+  const [localResults, setLocalResults] = useState<DictionaryEntry[]>([]);
+  const [apiResults, setApiResults] = useState<ApiWordEntry[]>([]);
+  const [searchState, setSearchState] = useState<SearchState>('idle');
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const wordOfDay = getWordOfDay();
   const topPad = Platform.OS === 'web' ? 67 : insets.top;
 
   const handleSearch = useCallback((text: string) => {
     setQuery(text);
-    if (text.trim()) {
-      setResults(searchWords(text));
-      setHasSearched(true);
-    } else {
-      setResults([]);
-      setHasSearched(false);
+
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+
+    if (!text.trim()) {
+      setLocalResults([]);
+      setApiResults([]);
+      setSearchState('idle');
+      return;
     }
+
+    // Instant local results
+    const local = searchWords(text);
+    setLocalResults(local);
+    setSearchState(local.length > 0 ? 'local' : 'loading');
+
+    // Debounced API call for exact word lookup
+    debounceRef.current = setTimeout(async () => {
+      const trimmed = text.trim();
+      // Only call API for single words
+      if (trimmed.includes(' ') || trimmed.length < 2) {
+        if (local.length === 0) setSearchState('empty');
+        return;
+      }
+      setSearchState('loading');
+      const results = await lookupWord(trimmed);
+      if (results && results.length > 0) {
+        setApiResults(results);
+        setSearchState('api');
+      } else {
+        setApiResults([]);
+        setSearchState(local.length > 0 ? 'local' : 'empty');
+      }
+    }, 600);
+  }, []);
+
+  useEffect(() => {
+    return () => { if (debounceRef.current) clearTimeout(debounceRef.current); };
   }, []);
 
   const handleWordPress = (entry: DictionaryEntry) => {
     if (Platform.OS !== 'web') Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     addToRecent(entry);
     router.push({ pathname: '/word', params: { word: entry.word } });
+  };
+
+  const handleApiWordPress = (entry: ApiWordEntry) => {
+    if (Platform.OS !== 'web') Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    router.push({ pathname: '/word', params: { word: entry.word, fromApi: '1' } });
   };
 
   const renderHeader = () => (
@@ -69,8 +112,6 @@ export default function HomeScreen() {
             <Feather name="zap" size={18} color={colors.gold} />
           </TouchableOpacity>
         </View>
-
-        {/* Search Bar */}
         <SearchBar
           value={query}
           onChangeText={handleSearch}
@@ -78,7 +119,36 @@ export default function HomeScreen() {
         />
       </View>
 
-      {!hasSearched && (
+      {/* Search Results Area */}
+      {searchState !== 'idle' && (
+        <View style={[styles.resultsHeader, { backgroundColor: colors.background }]}>
+          {searchState === 'loading' && (
+            <View style={styles.loadingRow}>
+              <ActivityIndicator size="small" color={colors.gold} />
+              <Text style={[styles.loadingText, { color: colors.mutedForeground, fontFamily: fonts.regular }]}>
+                Searching all dictionaries...
+              </Text>
+            </View>
+          )}
+          {searchState === 'api' && (
+            <View style={styles.sourceRow}>
+              <View style={[styles.sourceBadge, { backgroundColor: colors.gold + '20', borderColor: colors.gold }]}>
+                <Feather name="globe" size={11} color={colors.gold} />
+                <Text style={[styles.sourceText, { color: colors.gold, fontFamily: fonts.semiBold }]}>
+                  Live Dictionary — {query}
+                </Text>
+              </View>
+            </View>
+          )}
+          {searchState === 'local' && localResults.length > 0 && (
+            <Text style={[styles.resultCount, { color: colors.mutedForeground, fontFamily: fonts.regular }]}>
+              {localResults.length} match{localResults.length !== 1 ? 'es' : ''} found
+            </Text>
+          )}
+        </View>
+      )}
+
+      {!query && (
         <View style={[styles.content, { backgroundColor: colors.background }]}>
           {/* Word of the Day */}
           <View style={[styles.wotdCard, { backgroundColor: colors.navy }]}>
@@ -107,6 +177,14 @@ export default function HomeScreen() {
                 <Feather name="arrow-right" size={14} color={colors.gold} />
               </View>
             </TouchableOpacity>
+          </View>
+
+          {/* API tip card */}
+          <View style={[styles.tipCard, { backgroundColor: colors.goldLight, borderColor: colors.gold + '40' }]}>
+            <Feather name="globe" size={16} color={colors.goldDark} />
+            <Text style={[styles.tipText, { color: colors.goldDark, fontFamily: fonts.regular }]}>
+              Type any English word — live results from the internet dictionary
+            </Text>
           </View>
 
           {/* Recent Words */}
@@ -154,11 +232,30 @@ export default function HomeScreen() {
     </View>
   );
 
-  if (hasSearched) {
-    return (
-      <View style={[styles.flex, { backgroundColor: colors.background }]}>
+  // Decide what to show in list
+  const showApiResults = searchState === 'api' && apiResults.length > 0;
+  const showLocalResults = searchState === 'local' && localResults.length > 0;
+  const showEmpty = searchState === 'empty';
+
+  return (
+    <View style={[styles.flex, { backgroundColor: colors.background }]}>
+      {showApiResults ? (
         <FlatList
-          data={results}
+          data={apiResults}
+          keyExtractor={(item, i) => `${item.word}-${item.partOfSpeech}-${i}`}
+          ListHeaderComponent={renderHeader}
+          renderItem={({ item }) => (
+            <View style={{ paddingHorizontal: 16 }}>
+              <ApiWordCard entry={item} onPress={() => handleApiWordPress(item)} />
+            </View>
+          )}
+          contentContainerStyle={{ paddingBottom: Platform.OS === 'web' ? 34 : insets.bottom + 80 }}
+          keyboardShouldPersistTaps="handled"
+          keyboardDismissMode="on-drag"
+        />
+      ) : showLocalResults ? (
+        <FlatList
+          data={localResults}
           keyExtractor={(item) => item.word}
           ListHeaderComponent={renderHeader}
           renderItem={({ item }) => (
@@ -166,58 +263,54 @@ export default function HomeScreen() {
               <WordCard entry={item} compact onPress={() => handleWordPress(item)} />
             </View>
           )}
-          ListEmptyComponent={
-            <View style={styles.empty}>
-              <Feather name="search" size={40} color={colors.mutedForeground} />
-              <Text style={[styles.emptyText, { color: colors.mutedForeground, fontFamily: fonts.regular }]}>
-                No words found for "{query}"
-              </Text>
-            </View>
+          contentContainerStyle={{ paddingBottom: Platform.OS === 'web' ? 34 : insets.bottom + 80 }}
+          keyboardShouldPersistTaps="handled"
+          keyboardDismissMode="on-drag"
+        />
+      ) : (
+        <FlatList
+          data={[]}
+          ListHeaderComponent={renderHeader}
+          renderItem={null}
+          ListFooterComponent={
+            showEmpty ? (
+              <View style={styles.empty}>
+                <Feather name="search" size={40} color={colors.mutedForeground} />
+                <Text style={[styles.emptyText, { color: colors.mutedForeground, fontFamily: fonts.regular }]}>
+                  No results found for "{query}"
+                </Text>
+                <Text style={[styles.emptyHint, { color: colors.mutedForeground, fontFamily: fonts.regular }]}>
+                  Try checking spelling or use a different word
+                </Text>
+              </View>
+            ) : null
           }
           contentContainerStyle={{ paddingBottom: Platform.OS === 'web' ? 34 : insets.bottom + 80 }}
           keyboardShouldPersistTaps="handled"
           keyboardDismissMode="on-drag"
         />
-      </View>
-    );
-  }
-
-  return (
-    <View style={[styles.flex, { backgroundColor: colors.background }]}>
-      <FlatList
-        data={[]}
-        ListHeaderComponent={renderHeader}
-        renderItem={null}
-        contentContainerStyle={{ paddingBottom: Platform.OS === 'web' ? 34 : insets.bottom + 80 }}
-      />
+      )}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   flex: { flex: 1 },
-  header: {
-    paddingHorizontal: 20,
-    paddingBottom: 20,
-  },
+  header: { paddingHorizontal: 20, paddingBottom: 20 },
   goldAccent: { width: 40, height: 3, borderRadius: 2, marginBottom: 10 },
   headerRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 },
   appTitle: { fontSize: 30, letterSpacing: 1 },
   appSubtitle: { fontSize: 13, marginTop: 2, letterSpacing: 0.5 },
-  statsBtn: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    borderWidth: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
+  statsBtn: { width: 40, height: 40, borderRadius: 20, borderWidth: 1, justifyContent: 'center', alignItems: 'center' },
+  resultsHeader: { paddingHorizontal: 16, paddingTop: 12, paddingBottom: 4 },
+  loadingRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  loadingText: { fontSize: 13 },
+  sourceRow: { flexDirection: 'row', alignItems: 'center' },
+  sourceBadge: { flexDirection: 'row', alignItems: 'center', gap: 5, paddingHorizontal: 10, paddingVertical: 4, borderRadius: 20, borderWidth: 1 },
+  sourceText: { fontSize: 12 },
+  resultCount: { fontSize: 13 },
   content: { paddingHorizontal: 16, paddingTop: 16 },
-  wotdCard: {
-    borderRadius: 20,
-    padding: 20,
-    marginBottom: 20,
-  },
+  wotdCard: { borderRadius: 20, padding: 20, marginBottom: 14 },
   wotdHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 },
   wotdBadge: { paddingHorizontal: 10, paddingVertical: 4, borderRadius: 20 },
   wotdBadgeText: { fontSize: 11 },
@@ -226,11 +319,14 @@ const styles = StyleSheet.create({
   wotdDef: { fontSize: 14, lineHeight: 20, marginBottom: 14 },
   wotdCta: { flexDirection: 'row', alignItems: 'center', gap: 6, borderTopWidth: 1, paddingTop: 12 },
   wotdCtaText: { fontSize: 13 },
+  tipCard: { flexDirection: 'row', alignItems: 'center', gap: 10, padding: 12, borderRadius: 12, borderWidth: 1, marginBottom: 20 },
+  tipText: { flex: 1, fontSize: 13, lineHeight: 18 },
   section: { marginBottom: 20 },
   sectionTitle: { fontSize: 17, marginBottom: 12 },
   pillRow: { flexDirection: 'row', gap: 10 },
   pill: { flex: 1, paddingVertical: 10, borderRadius: 12, borderWidth: 1, alignItems: 'center' },
   pillText: { fontSize: 12 },
-  empty: { alignItems: 'center', paddingVertical: 60, gap: 12 },
+  empty: { alignItems: 'center', paddingVertical: 60, gap: 8, paddingHorizontal: 32 },
   emptyText: { fontSize: 15, textAlign: 'center' },
+  emptyHint: { fontSize: 13, textAlign: 'center', opacity: 0.7 },
 });
