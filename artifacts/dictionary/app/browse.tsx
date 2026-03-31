@@ -8,6 +8,7 @@ import { useColors } from '@/hooks/useColors';
 import { useApp } from '@/context/AppContext';
 import WordCard from '@/components/WordCard';
 import { dictionaryData, getWordsByDifficulty, DictionaryEntry } from '@/data/dictionary';
+import { fonts } from '@/utils/fonts';
 
 export default function BrowseScreen() {
   const { filter } = useLocalSearchParams<{ filter?: string }>();
@@ -46,11 +47,11 @@ export default function BrowseScreen() {
           <TouchableOpacity onPress={() => router.back()} style={[styles.backBtn, { backgroundColor: colors.gold + '20' }]}>
             <Feather name="arrow-left" size={20} color={colors.gold} />
           </TouchableOpacity>
-          <Text style={[styles.title, { color: colors.gold, fontFamily: 'Inter_700Bold' }]}>Browse Words</Text>
+          <Text style={[styles.title, { color: colors.gold, fontFamily: fonts.bold }]}>Browse Words</Text>
           <View style={{ width: 40 }} />
         </View>
 
-        <Text style={[styles.count, { color: '#FFFFFF', fontFamily: 'Inter_400Regular', opacity: 0.7 }]}>
+        <Text style={[styles.count, { color: '#FFFFFF', fontFamily: fonts.regular, opacity: 0.7 }]}>
           {words.length} words
         </Text>
 
@@ -67,7 +68,7 @@ export default function BrowseScreen() {
               ]}
               onPress={() => setActiveFilter(f.value)}
             >
-              <Text style={[styles.filterText, { color: activeFilter === f.value ? '#0D1117' : f.color, fontFamily: 'Inter_600SemiBold' }]}>
+              <Text style={[styles.filterText, { color: activeFilter === f.value ? '#0D1117' : f.color, fontFamily: fonts.semiBold }]}>
                 {f.label}
               </Text>
             </TouchableOpacity>

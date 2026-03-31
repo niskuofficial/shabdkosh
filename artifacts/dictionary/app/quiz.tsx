@@ -5,7 +5,6 @@ import {
   StyleSheet,
   TouchableOpacity,
   Platform,
-  Animated,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Feather } from '@expo/vector-icons';
@@ -15,6 +14,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useColors } from '@/hooks/useColors';
 import { useApp } from '@/context/AppContext';
 import { dictionaryData, DictionaryEntry } from '@/data/dictionary';
+import { fonts } from '@/utils/fonts';
 
 function getQuizQuestion(data: DictionaryEntry[]) {
   const shuffled = [...data].sort(() => Math.random() - 0.5);
@@ -78,21 +78,21 @@ export default function QuizScreen() {
           <TouchableOpacity onPress={() => router.back()} style={[styles.backBtn, { backgroundColor: colors.gold + '20' }]}>
             <Feather name="arrow-left" size={20} color={colors.gold} />
           </TouchableOpacity>
-          <Text style={[styles.title, { color: colors.gold, fontFamily: 'Inter_700Bold' }]}>Vocab Quiz</Text>
+          <Text style={[styles.title, { color: colors.gold, fontFamily: fonts.bold }]}>Vocab Quiz</Text>
           <View style={[styles.scoreBox, { backgroundColor: colors.gold }]}>
-            <Text style={[styles.scoreText, { fontFamily: 'Inter_700Bold' }]}>{quizScore}</Text>
+            <Text style={[styles.scoreText, { color: '#0D1117', fontFamily: fonts.bold }]}>{quizScore}</Text>
           </View>
         </View>
 
         <View style={styles.statsRow}>
           {streak > 1 && (
             <View style={[styles.streakBadge, { backgroundColor: '#f59e0b20', borderColor: '#f59e0b' }]}>
-              <Text style={[styles.streakText, { color: '#f59e0b', fontFamily: 'Inter_700Bold' }]}>
+              <Text style={[styles.streakText, { color: '#f59e0b', fontFamily: fonts.bold }]}>
                 {streak}x Streak!
               </Text>
             </View>
           )}
-          <Text style={[styles.statText, { color: '#FFFFFF', fontFamily: 'Inter_400Regular', opacity: 0.7 }]}>
+          <Text style={[styles.statText, { color: '#FFFFFF', fontFamily: fonts.regular, opacity: 0.7 }]}>
             {total > 0 ? `${quizScore}/${total} correct` : 'Pick the Hindi translation'}
           </Text>
         </View>
@@ -101,18 +101,18 @@ export default function QuizScreen() {
       <View style={[styles.content, { paddingBottom: Platform.OS === 'web' ? 34 : insets.bottom + 40 }]}>
         {/* Question */}
         <View style={[styles.questionCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
-          <Text style={[styles.questionLabel, { color: colors.mutedForeground, fontFamily: 'Inter_500Medium' }]}>
+          <Text style={[styles.questionLabel, { color: colors.mutedForeground, fontFamily: fonts.medium }]}>
             What is the Hindi translation of...
           </Text>
-          <Text style={[styles.questionWord, { color: colors.foreground, fontFamily: 'Inter_700Bold' }]}>
+          <Text style={[styles.questionWord, { color: colors.foreground, fontFamily: fonts.bold }]}>
             {correct.word}
           </Text>
           {correct.pronunciation && (
-            <Text style={[styles.questionPron, { color: colors.gold, fontFamily: 'Inter_400Regular' }]}>
+            <Text style={[styles.questionPron, { color: colors.gold, fontFamily: fonts.regular }]}>
               /{correct.pronunciation}/
             </Text>
           )}
-          <Text style={[styles.questionDef, { color: colors.mutedForeground, fontFamily: 'Inter_400Regular' }]}>
+          <Text style={[styles.questionDef, { color: colors.mutedForeground, fontFamily: fonts.regular }]}>
             {correct.definition}
           </Text>
         </View>
@@ -133,10 +133,10 @@ export default function QuizScreen() {
               {selected && opt.hindi === selected && opt.hindi !== correct.hindi && (
                 <Feather name="x-circle" size={18} color="#ef4444" style={styles.optionIcon} />
               )}
-              <Text style={[styles.optionText, { color: getOptionTextColor(opt.hindi), fontFamily: 'Inter_600SemiBold' }]}>
+              <Text style={[styles.optionText, { color: getOptionTextColor(opt.hindi), fontFamily: fonts.semiBold }]}>
                 {opt.hindi}
               </Text>
-              <Text style={[styles.optionSub, { color: colors.mutedForeground, fontFamily: 'Inter_400Regular' }]}>
+              <Text style={[styles.optionSub, { color: colors.mutedForeground, fontFamily: fonts.regular }]}>
                 {opt.hindiPronunciation}
               </Text>
             </TouchableOpacity>
@@ -149,7 +149,7 @@ export default function QuizScreen() {
             style={[styles.nextBtn, { backgroundColor: colors.gold }]}
             onPress={nextQuestion}
           >
-            <Text style={[styles.nextBtnText, { color: '#0D1117', fontFamily: 'Inter_700Bold' }]}>
+            <Text style={[styles.nextBtnText, { color: '#0D1117', fontFamily: fonts.bold }]}>
               Next Question
             </Text>
             <Feather name="arrow-right" size={18} color="#0D1117" />
@@ -167,7 +167,7 @@ const styles = StyleSheet.create({
   backBtn: { width: 40, height: 40, borderRadius: 20, justifyContent: 'center', alignItems: 'center' },
   title: { fontSize: 22 },
   scoreBox: { paddingHorizontal: 14, paddingVertical: 6, borderRadius: 20 },
-  scoreText: { fontSize: 15, color: '#0D1117' },
+  scoreText: { fontSize: 15 },
   statsRow: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   streakBadge: { paddingHorizontal: 10, paddingVertical: 4, borderRadius: 20, borderWidth: 1 },
   streakText: { fontSize: 12 },

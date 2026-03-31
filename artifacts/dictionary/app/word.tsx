@@ -15,6 +15,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useColors } from '@/hooks/useColors';
 import { useApp } from '@/context/AppContext';
 import { dictionaryData } from '@/data/dictionary';
+import { fonts } from '@/utils/fonts';
 
 const DIFFICULTY_COLORS = {
   basic: '#22c55e',
@@ -43,7 +44,7 @@ export default function WordScreen() {
   if (!entry) {
     return (
       <View style={[styles.center, { backgroundColor: colors.background }]}>
-        <Text style={[styles.notFound, { color: colors.foreground, fontFamily: 'Inter_400Regular' }]}>
+        <Text style={[styles.notFound, { color: colors.foreground, fontFamily: fonts.regular }]}>
           Word not found.
         </Text>
       </View>
@@ -63,28 +64,31 @@ export default function WordScreen() {
           <TouchableOpacity onPress={() => router.back()} style={[styles.backBtn, { backgroundColor: colors.gold + '20' }]}>
             <Feather name="arrow-left" size={20} color={colors.gold} />
           </TouchableOpacity>
-          <TouchableOpacity onPress={toggleFav} style={[styles.favBtn, { backgroundColor: fav ? colors.gold + '20' : 'transparent', borderColor: colors.gold + '40', borderWidth: 1 }]}>
+          <TouchableOpacity
+            onPress={toggleFav}
+            style={[styles.favBtn, { backgroundColor: fav ? colors.gold + '20' : 'transparent', borderColor: colors.gold + '40', borderWidth: 1 }]}
+          >
             <Feather name="bookmark" size={20} color={fav ? colors.gold : colors.mutedForeground} />
           </TouchableOpacity>
         </View>
 
         <View style={[styles.diffBadge, { backgroundColor: diffColor + '25', borderColor: diffColor }]}>
-          <Text style={[styles.diffText, { color: diffColor, fontFamily: 'Inter_600SemiBold' }]}>
+          <Text style={[styles.diffText, { color: diffColor, fontFamily: fonts.semiBold }]}>
             {entry.difficulty}
           </Text>
         </View>
 
-        <Text style={[styles.heroWord, { color: '#FFFFFF', fontFamily: 'Inter_700Bold' }]}>
+        <Text style={[styles.heroWord, { color: '#FFFFFF', fontFamily: fonts.bold }]}>
           {entry.word}
         </Text>
 
         {entry.pronunciation && (
-          <Text style={[styles.heroPron, { color: colors.gold, fontFamily: 'Inter_400Regular' }]}>
+          <Text style={[styles.heroPron, { color: colors.gold, fontFamily: fonts.regular }]}>
             /{entry.pronunciation}/
           </Text>
         )}
 
-        <Text style={[styles.heroPos, { color: '#FFFFFF', fontFamily: 'Inter_400Regular', opacity: 0.6 }]}>
+        <Text style={[styles.heroPos, { color: '#FFFFFF', fontFamily: fonts.regular, opacity: 0.6 }]}>
           {entry.partOfSpeech}
         </Text>
       </View>
@@ -94,15 +98,15 @@ export default function WordScreen() {
         <View style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }]}>
           <View style={styles.cardHeader}>
             <View style={[styles.cardAccent, { backgroundColor: colors.gold }]} />
-            <Text style={[styles.cardLabel, { color: colors.mutedForeground, fontFamily: 'Inter_500Medium' }]}>
+            <Text style={[styles.cardLabel, { color: colors.mutedForeground, fontFamily: fonts.medium }]}>
               Hindi Translation
             </Text>
           </View>
-          <Text style={[styles.hindiWord, { color: colors.gold, fontFamily: 'Inter_700Bold' }]}>
+          <Text style={[styles.hindiWord, { color: colors.gold, fontFamily: fonts.bold }]}>
             {entry.hindi}
           </Text>
           {entry.hindiPronunciation && (
-            <Text style={[styles.hindiPron, { color: colors.mutedForeground, fontFamily: 'Inter_400Regular' }]}>
+            <Text style={[styles.hindiPron, { color: colors.mutedForeground, fontFamily: fonts.regular }]}>
               {entry.hindiPronunciation}
             </Text>
           )}
@@ -112,11 +116,11 @@ export default function WordScreen() {
         <View style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }]}>
           <View style={styles.cardHeader}>
             <View style={[styles.cardAccent, { backgroundColor: '#60a5fa' }]} />
-            <Text style={[styles.cardLabel, { color: colors.mutedForeground, fontFamily: 'Inter_500Medium' }]}>
+            <Text style={[styles.cardLabel, { color: colors.mutedForeground, fontFamily: fonts.medium }]}>
               Definition
             </Text>
           </View>
-          <Text style={[styles.definition, { color: colors.foreground, fontFamily: 'Inter_400Regular' }]}>
+          <Text style={[styles.definition, { color: colors.foreground, fontFamily: fonts.regular }]}>
             {entry.definition}
           </Text>
         </View>
@@ -126,11 +130,11 @@ export default function WordScreen() {
           <View style={[styles.card, { backgroundColor: colors.goldLight, borderColor: colors.gold + '30' }]}>
             <View style={styles.cardHeader}>
               <View style={[styles.cardAccent, { backgroundColor: colors.gold }]} />
-              <Text style={[styles.cardLabel, { color: colors.goldDark, fontFamily: 'Inter_500Medium' }]}>
+              <Text style={[styles.cardLabel, { color: colors.goldDark, fontFamily: fonts.medium }]}>
                 Example
               </Text>
             </View>
-            <Text style={[styles.example, { color: colors.navy, fontFamily: 'Inter_400Regular' }]}>
+            <Text style={[styles.example, { color: colors.navy, fontFamily: fonts.regular }]}>
               "{entry.example}"
             </Text>
           </View>
@@ -141,14 +145,14 @@ export default function WordScreen() {
           <View style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }]}>
             <View style={styles.cardHeader}>
               <View style={[styles.cardAccent, { backgroundColor: '#a78bfa' }]} />
-              <Text style={[styles.cardLabel, { color: colors.mutedForeground, fontFamily: 'Inter_500Medium' }]}>
+              <Text style={[styles.cardLabel, { color: colors.mutedForeground, fontFamily: fonts.medium }]}>
                 Synonyms
               </Text>
             </View>
             <View style={styles.synonymRow}>
               {entry.synonyms.map((s, i) => (
                 <View key={i} style={[styles.synChip, { backgroundColor: colors.muted, borderColor: colors.border }]}>
-                  <Text style={[styles.synText, { color: colors.foreground, fontFamily: 'Inter_500Medium' }]}>{s}</Text>
+                  <Text style={[styles.synText, { color: colors.foreground, fontFamily: fonts.medium }]}>{s}</Text>
                 </View>
               ))}
             </View>
@@ -159,7 +163,7 @@ export default function WordScreen() {
         {entry.category && (
           <View style={styles.metaRow}>
             <Feather name="tag" size={14} color={colors.mutedForeground} />
-            <Text style={[styles.metaText, { color: colors.mutedForeground, fontFamily: 'Inter_400Regular' }]}>
+            <Text style={[styles.metaText, { color: colors.mutedForeground, fontFamily: fonts.regular }]}>
               Category: {entry.category}
             </Text>
           </View>

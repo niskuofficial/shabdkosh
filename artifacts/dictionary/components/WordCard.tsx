@@ -5,6 +5,7 @@ import * as Haptics from 'expo-haptics';
 import { DictionaryEntry } from '@/data/dictionary';
 import { useColors } from '@/hooks/useColors';
 import { useApp } from '@/context/AppContext';
+import { fonts } from '@/utils/fonts';
 
 interface WordCardProps {
   entry: DictionaryEntry;
@@ -37,23 +38,23 @@ export default function WordCard({ entry, onPress, compact }: WordCardProps) {
     >
       <View style={styles.topRow}>
         <View style={styles.wordGroup}>
-          <Text style={[styles.word, { color: colors.foreground, fontFamily: 'Inter_700Bold' }]}>
+          <Text style={[styles.word, { color: colors.foreground, fontFamily: fonts.bold }]}>
             {entry.word}
           </Text>
           {!compact && entry.pronunciation && (
-            <Text style={[styles.pronunciation, { color: colors.gold, fontFamily: 'Inter_400Regular' }]}>
+            <Text style={[styles.pronunciation, { color: colors.gold, fontFamily: fonts.regular }]}>
               /{entry.pronunciation}/
             </Text>
           )}
         </View>
         <View style={styles.rightGroup}>
           <View style={[styles.badge, { backgroundColor: DIFFICULTY_COLORS[entry.difficulty] + '20', borderColor: DIFFICULTY_COLORS[entry.difficulty] }]}>
-            <Text style={[styles.badgeText, { color: DIFFICULTY_COLORS[entry.difficulty] }]}>
+            <Text style={[styles.badgeText, { color: DIFFICULTY_COLORS[entry.difficulty], fontFamily: fonts.semiBold }]}>
               {entry.difficulty}
             </Text>
           </View>
           <TouchableOpacity onPress={toggleFav} style={styles.favBtn} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
-            <Feather name={fav ? 'bookmark' : 'bookmark'} size={18} color={fav ? colors.gold : colors.mutedForeground} solid={fav} />
+            <Feather name="bookmark" size={18} color={fav ? colors.gold : colors.mutedForeground} />
           </TouchableOpacity>
         </View>
       </View>
@@ -61,11 +62,11 @@ export default function WordCard({ entry, onPress, compact }: WordCardProps) {
       <View style={[styles.divider, { backgroundColor: colors.goldLight }]} />
 
       <View style={styles.hindiRow}>
-        <Text style={[styles.hindi, { color: colors.gold, fontFamily: 'Inter_700Bold' }]}>
+        <Text style={[styles.hindi, { color: colors.gold, fontFamily: fonts.bold }]}>
           {entry.hindi}
         </Text>
         {!compact && entry.hindiPronunciation && (
-          <Text style={[styles.hindiPron, { color: colors.mutedForeground, fontFamily: 'Inter_400Regular' }]}>
+          <Text style={[styles.hindiPron, { color: colors.mutedForeground, fontFamily: fonts.regular }]}>
             {entry.hindiPronunciation}
           </Text>
         )}
@@ -73,14 +74,14 @@ export default function WordCard({ entry, onPress, compact }: WordCardProps) {
 
       {!compact && (
         <>
-          <Text style={[styles.posLabel, { color: colors.mutedForeground, fontFamily: 'Inter_400Regular' }]}>
+          <Text style={[styles.posLabel, { color: colors.mutedForeground, fontFamily: fonts.regular }]}>
             {entry.partOfSpeech}
           </Text>
-          <Text style={[styles.definition, { color: colors.foreground, fontFamily: 'Inter_400Regular' }]}>
+          <Text style={[styles.definition, { color: colors.foreground, fontFamily: fonts.regular }]}>
             {entry.definition}
           </Text>
           {entry.example && (
-            <Text style={[styles.example, { color: colors.mutedForeground, fontFamily: 'Inter_400Regular' }]}>
+            <Text style={[styles.example, { color: colors.mutedForeground, fontFamily: fonts.regular }]}>
               "{entry.example}"
             </Text>
           )}
@@ -88,7 +89,7 @@ export default function WordCard({ entry, onPress, compact }: WordCardProps) {
             <View style={styles.synonymRow}>
               {entry.synonyms.slice(0, 3).map((s, i) => (
                 <View key={i} style={[styles.synonym, { backgroundColor: colors.goldLight, borderColor: colors.border }]}>
-                  <Text style={[styles.synonymText, { color: colors.goldDark, fontFamily: 'Inter_500Medium' }]}>{s}</Text>
+                  <Text style={[styles.synonymText, { color: colors.goldDark, fontFamily: fonts.medium }]}>{s}</Text>
                 </View>
               ))}
             </View>

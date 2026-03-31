@@ -16,7 +16,8 @@ import { useColors } from '@/hooks/useColors';
 import { useApp } from '@/context/AppContext';
 import SearchBar from '@/components/SearchBar';
 import WordCard from '@/components/WordCard';
-import { searchWords, getWordOfDay, dictionaryData, DictionaryEntry } from '@/data/dictionary';
+import { searchWords, getWordOfDay, DictionaryEntry } from '@/data/dictionary';
+import { fonts } from '@/utils/fonts';
 
 export default function HomeScreen() {
   const colors = useColors();
@@ -54,10 +55,10 @@ export default function HomeScreen() {
         <View style={[styles.goldAccent, { backgroundColor: colors.gold }]} />
         <View style={styles.headerRow}>
           <View>
-            <Text style={[styles.appTitle, { color: colors.gold, fontFamily: 'Inter_700Bold' }]}>
+            <Text style={[styles.appTitle, { color: colors.gold, fontFamily: fonts.bold }]}>
               Shabdkosh
             </Text>
-            <Text style={[styles.appSubtitle, { color: '#FFFFFF', fontFamily: 'Inter_400Regular', opacity: 0.75 }]}>
+            <Text style={[styles.appSubtitle, { color: '#FFFFFF', fontFamily: fonts.regular, opacity: 0.75 }]}>
               English — Hindi Dictionary
             </Text>
           </View>
@@ -70,13 +71,11 @@ export default function HomeScreen() {
         </View>
 
         {/* Search Bar */}
-        <View style={styles.searchContainer}>
-          <SearchBar
-            value={query}
-            onChangeText={handleSearch}
-            onClear={() => handleSearch('')}
-          />
-        </View>
+        <SearchBar
+          value={query}
+          onChangeText={handleSearch}
+          onClear={() => handleSearch('')}
+        />
       </View>
 
       {!hasSearched && (
@@ -85,22 +84,24 @@ export default function HomeScreen() {
           <View style={[styles.wotdCard, { backgroundColor: colors.navy }]}>
             <View style={styles.wotdHeader}>
               <View style={[styles.wotdBadge, { backgroundColor: colors.gold }]}>
-                <Text style={[styles.wotdBadgeText, { fontFamily: 'Inter_700Bold' }]}>Word of the Day</Text>
+                <Text style={[styles.wotdBadgeText, { color: '#0D1117', fontFamily: fonts.bold }]}>
+                  Word of the Day
+                </Text>
               </View>
               <Feather name="sun" size={18} color={colors.gold} />
             </View>
             <TouchableOpacity onPress={() => handleWordPress(wordOfDay)} activeOpacity={0.85}>
-              <Text style={[styles.wotdWord, { color: '#FFFFFF', fontFamily: 'Inter_700Bold' }]}>
+              <Text style={[styles.wotdWord, { color: '#FFFFFF', fontFamily: fonts.bold }]}>
                 {wordOfDay.word}
               </Text>
-              <Text style={[styles.wotdHindi, { color: colors.gold, fontFamily: 'Inter_700Bold' }]}>
+              <Text style={[styles.wotdHindi, { color: colors.gold, fontFamily: fonts.bold }]}>
                 {wordOfDay.hindi}
               </Text>
-              <Text style={[styles.wotdDef, { color: '#FFFFFF', fontFamily: 'Inter_400Regular', opacity: 0.8 }]}>
+              <Text style={[styles.wotdDef, { color: '#FFFFFF', fontFamily: fonts.regular, opacity: 0.8 }]}>
                 {wordOfDay.definition}
               </Text>
               <View style={[styles.wotdCta, { borderColor: colors.gold + '50' }]}>
-                <Text style={[styles.wotdCtaText, { color: colors.gold, fontFamily: 'Inter_500Medium' }]}>
+                <Text style={[styles.wotdCtaText, { color: colors.gold, fontFamily: fonts.medium }]}>
                   View Full Entry
                 </Text>
                 <Feather name="arrow-right" size={14} color={colors.gold} />
@@ -111,7 +112,7 @@ export default function HomeScreen() {
           {/* Recent Words */}
           {recentWords.length > 0 && (
             <View style={styles.section}>
-              <Text style={[styles.sectionTitle, { color: colors.foreground, fontFamily: 'Inter_600SemiBold' }]}>
+              <Text style={[styles.sectionTitle, { color: colors.foreground, fontFamily: fonts.semiBold }]}>
                 Recent
               </Text>
               {recentWords.slice(0, 3).map((entry) => (
@@ -127,7 +128,7 @@ export default function HomeScreen() {
 
           {/* Quick Browse */}
           <View style={styles.section}>
-            <Text style={[styles.sectionTitle, { color: colors.foreground, fontFamily: 'Inter_600SemiBold' }]}>
+            <Text style={[styles.sectionTitle, { color: colors.foreground, fontFamily: fonts.semiBold }]}>
               Browse by Difficulty
             </Text>
             <View style={styles.pillRow}>
@@ -141,7 +142,7 @@ export default function HomeScreen() {
                   style={[styles.pill, { backgroundColor: d.color + '15', borderColor: d.color }]}
                   onPress={() => router.push({ pathname: '/browse', params: { filter: d.route } })}
                 >
-                  <Text style={[styles.pillText, { color: d.color, fontFamily: 'Inter_600SemiBold' }]}>
+                  <Text style={[styles.pillText, { color: d.color, fontFamily: fonts.semiBold }]}>
                     {d.label}
                   </Text>
                 </TouchableOpacity>
@@ -168,7 +169,7 @@ export default function HomeScreen() {
           ListEmptyComponent={
             <View style={styles.empty}>
               <Feather name="search" size={40} color={colors.mutedForeground} />
-              <Text style={[styles.emptyText, { color: colors.mutedForeground, fontFamily: 'Inter_400Regular' }]}>
+              <Text style={[styles.emptyText, { color: colors.mutedForeground, fontFamily: fonts.regular }]}>
                 No words found for "{query}"
               </Text>
             </View>
@@ -211,7 +212,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  searchContainer: {},
   content: { paddingHorizontal: 16, paddingTop: 16 },
   wotdCard: {
     borderRadius: 20,
@@ -220,7 +220,7 @@ const styles = StyleSheet.create({
   },
   wotdHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 },
   wotdBadge: { paddingHorizontal: 10, paddingVertical: 4, borderRadius: 20 },
-  wotdBadgeText: { fontSize: 11, color: '#0D1117' },
+  wotdBadgeText: { fontSize: 11 },
   wotdWord: { fontSize: 32, marginBottom: 4 },
   wotdHindi: { fontSize: 22, marginBottom: 8 },
   wotdDef: { fontSize: 14, lineHeight: 20, marginBottom: 14 },

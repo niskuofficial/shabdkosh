@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, Platform } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useColors } from '@/hooks/useColors';
+import { fonts } from '@/utils/fonts';
 
 interface GoldHeaderProps {
   title: string;
@@ -19,9 +20,9 @@ export default function GoldHeader({ title, subtitle, rightComponent }: GoldHead
       <View style={[styles.accent, { backgroundColor: colors.gold }]} />
       <View style={styles.row}>
         <View style={styles.textGroup}>
-          <Text style={[styles.title, { color: colors.gold, fontFamily: 'Inter_700Bold' }]}>{title}</Text>
+          <Text style={[styles.title, { color: colors.gold, fontFamily: fonts.bold }]}>{title}</Text>
           {subtitle && (
-            <Text style={[styles.subtitle, { color: colors.primaryForeground, fontFamily: 'Inter_400Regular', opacity: 0.7 }]}>
+            <Text style={[styles.subtitle, { color: '#FFFFFF', fontFamily: fonts.regular, opacity: 0.7 }]}>
               {subtitle}
             </Text>
           )}

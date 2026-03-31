@@ -8,6 +8,7 @@ import { useColors } from '@/hooks/useColors';
 import { useApp } from '@/context/AppContext';
 import WordCard from '@/components/WordCard';
 import GoldHeader from '@/components/GoldHeader';
+import { fonts } from '@/utils/fonts';
 
 export default function FavoritesScreen() {
   const colors = useColors();
@@ -41,10 +42,10 @@ export default function FavoritesScreen() {
         ListEmptyComponent={
           <View style={styles.empty}>
             <Feather name="bookmark" size={48} color={colors.mutedForeground} />
-            <Text style={[styles.emptyTitle, { color: colors.foreground, fontFamily: 'Inter_600SemiBold' }]}>
+            <Text style={[styles.emptyTitle, { color: colors.foreground, fontFamily: fonts.semiBold }]}>
               No saved words yet
             </Text>
-            <Text style={[styles.emptyText, { color: colors.mutedForeground, fontFamily: 'Inter_400Regular' }]}>
+            <Text style={[styles.emptyText, { color: colors.mutedForeground, fontFamily: fonts.regular }]}>
               Bookmark words while browsing to save them here
             </Text>
           </View>
